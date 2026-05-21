@@ -86,6 +86,7 @@ docker run -tid --privileged \
   --hostname btspluto \
   btspluto:v1
 ```
+If problem authority replace the  `-v $XAUTHORITY:/home/user/.Xauthority:ro` by :  `-v /root/.Xauthority:/home/user/.Xauthority:ro`
 ```
 xhost +
 ```
