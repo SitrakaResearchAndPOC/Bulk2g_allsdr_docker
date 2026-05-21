@@ -1,0 +1,219 @@
+  apt update
+
+  apt install docker.io
+
+  docker pull debian:buster
+
+  docker run -itd --name pluto2g -h pluto2g debian:buster
+
+  docker exec -it pluto2g bash
+
+
+  echo "deb http://archive.debian.org/debian buster main contrib non-free" > /etc/apt/sources.list &&     echo "deb http://archive.debian.org/debian-security buster/updates main" >> /etc/apt/sources.list &&     echo 'Acquire::Check-Valid-Until "0";' > /etc/apt/apt.conf.d/99no-check-valid-until &&     apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30
+   
+Pour une machine Ubuntu 24.04 réelle (pas Docker), voici la séquence propre et minimale pour installer :
+
+
+SoapySDR avec timestamp support
+PlutoSDR timestamping
+libiio 0.24
+osmo-trx Soapy fork
+sur un système propre.
+
+
+
+
+1. Dépendances Ubuntu 24.04
+
+
+apt install -y     git     build-essential     cmake     g++     autoconf     automake     libtool     pkg-config     swig     python3-dev     libxml2     libxml2-dev     bison     flex     libcdk5-dev     libusb-1.0-0-dev     libaio-dev     libfftw3-dev     libsctp-dev     libboost-program-options-dev     libconfig++-dev     libboost-all-dev     libzmq3-dev     libreadline-dev     libncurses5-dev     libssl-dev     wget     curl      ca-certificates
+  
+
+apt-get update && apt-get install -y -o Acquire::Retries=5 --no-install-recommends \
+    git \
+    build-essential \
+    cmake \
+    g++ \
+    autoconf \
+    automake \
+    libtool \
+    pkg-config \
+    swig \
+    python3-dev \
+    libxml2 \
+    libxml2-dev \
+    bison \
+    flex \
+    libcdk5-dev \
+    libusb-1.0-0-dev \
+    libaio-dev \
+    libfftw3-dev \
+    libsctp-dev \
+    libboost-program-options-dev \
+    libconfig++-dev \
+    libboost-all-dev \
+    libzmq3-dev \
+    libreadline-dev \
+    libncurses5-dev \
+    libssl-dev \
+    wget \
+    curl \
+    ca-certificates \
+
+
+2. Préparer le préfixe local
+
+
+echo 'export SRS_INSTALL=$HOME/srs' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=$SRS_INSTALL/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+echo 'export PKG_CONFIG_PATH=$SRS_INSTALL/lib/pkgconfig:$PKG_CONFIG_PATH' >> ~/.bashrc
+echo 'export SOAPY_SDR_PLUGIN_PATH=$SRS_INSTALL/lib/SoapySDR/modules0.8' >> ~/.bashrc
+source ~/.bashrc
+
+3. Installer SoapySDR (source)
+cd ~
+git clone \
+    --branch soapy-sdr-0.8.1 \
+    https://github.com/pothosware/SoapySDR.git
+cd SoapySDR
+mkdir build && cd build
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$SRS_INSTALL \
+    -DCMAKE_PREFIX_PATH=$SRS_INSTALL \
+    ..
+make -j$(nproc)
+make install
+
+4. Installer libiio 0.24
+cd ~
+git clone \
+    --branch v0.24 \
+    https://github.com/analogdevicesinc/libiio.git
+
+cd ~/libiio
+rm -rf build
+mkdir build
+cd build
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$SRS_INSTALL \
+    -DCMAKE_PREFIX_PATH=$SRS_INSTALL \
+    -DUDEV_RULES_INSTALL_DIR=$SRS_INSTALL/etc/udev/rules.d \
+    -DHAVE_DNS_SD=OFF \
+    ../
+make -j$(nproc)
+make install
+
+
+5. Installer libad9361-iio
+cd ~/libad9361-iio
+rm -rf build
+mkdir build
+cd build
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$SRS_INSTALL \
+    -DCMAKE_PREFIX_PATH=$SRS_INSTALL \
+    ../
+make -j$(nproc)
+make install
+
+
+
+6. Installer SoapyPlutoSDR timestamping
+cd ~
+git clone \
+    --branch sdr_gadget_timestamping \
+    https://github.com/pgreenland/SoapyPlutoSDR.git
+cd SoapyPlutoSDR
+rm -rf build
+mkdir build
+cd build
+cmake \
+    -DCMAKE_INSTALL_PREFIX=$SRS_INSTALL \
+    -DCMAKE_PREFIX_PATH=$SRS_INSTALL \
+    ..
+make -j$(nproc)
+make install
+
+
+Dépôts utilisés :
+
+SoapySDR
+libiio
+libad9361-iio
+SoapyPlutoSDR
+fork_osmo-trx_soapy
+
+
+
+7. Vérifier SoapySDR
+$SRS_INSTALL/SoapySDRUtil --info
+
+Puis :
+
+$SRS_INSTALL/bin/SoapySDRUtil --find
+
+Tu dois voir :
+
+driver=plutosdr
+
+
+8. Ajouter la règle udev PlutoSDR (Dans la machine hôte et no Dockerisé)
+echo 'SUBSYSTEM=="usb", ATTR{idVendor}=="0456", ATTR{idProduct}=="b673", MODE="666"' | sudo tee /etc/udev/rules.d/90-libiio_pluto.rules
+
+Puis :
+
+sudo udevadm control --reload-rules
+
+sudo udevadm trigger
+
+Débrancher/rebrancher le Pluto ensuite.
+
+9. Compiler osmo-trx Soapy
+cd ~
+
+git clone \
+    https://github.com/SitrakaResearchAndPOC/fork_osmo-trx_soapy.git
+
+cd fork_osmo-trx_soapy
+
+Compiler :
+
+autoreconf -fi
+
+./configure \
+    --without-uhd \
+    --without-lms \
+    --with-soapy-trx
+
+make -j$(nproc)
+make install 
+
+10. Lancer osmo-trx
+cd Transceiver52M
+
+./osmo-trx-soapy -C test1.cfg
+
+
+
+
+******
+sudo apt install -y tmux
+Puis les composants Osmocom :
+
+sudo apt install -y \
+    osmo-hlr \
+    osmo-stp \
+    osmo-msc \
+    osmo-mgw \
+    osmo-bsc \
+    osmo-bts
+
+Vérifie ensuite qu’ils existent :
+
+which osmo-hlr
+which osmo-stp
+which osmo-msc
+which osmo-mgw
+which osmo-bsc
+which osmo-bts
+
