@@ -1,6 +1,6 @@
 # Installing using USRP
-[installing usrp]()
+[installing usrp](https://github.com/SitrakaResearchAndPOC/Bulg2g_allsdr_docker/tree/main/usrp)
 
 
 # Installing using PlutoSDR
-[installing plutosdr]()
+[installing plutosdr](https://github.com/SitrakaResearchAndPOC/Bulg2g_allsdr_docker/tree/main/plutosdr)
