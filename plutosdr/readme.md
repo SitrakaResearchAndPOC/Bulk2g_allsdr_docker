@@ -151,9 +151,15 @@ docker exec -ti bulk2g_pluto bash -c 'SoapySDRUtil --info'
 ```
 docker exec -ti bulk2g_pluto bash -c 'SoapySDRUtil --find'
 ```
+* Over USB
 ```
 docker exec -ti bulk2g_pluto  bash -c 'SoapySDRUtil --probe="driver=plutosdr"'
 ```
+* Over Ethernet
+```
+docker exec -ti bulk2g_pluto  bash -c 'SoapySDRUtil --probe="driver=plutosdr,hostname=$NAME_PLUTO.local"'
+```  
+
 ## VII. Launching transceiver
 ### In terminal 1
 ```
@@ -174,7 +180,7 @@ Tape ctrl+shift+T   </br>
 ### In terminal 3
 launch command of : 
 * VIII. Testing PlutoSDR SpoofScript1
-and / or
+</br> and / or
 * IX. Testing PlutoSDR SpoofScript2
 
 ## VIII. Testing PlutoSDR SpoofScript1
