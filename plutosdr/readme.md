@@ -170,6 +170,11 @@ docker exec -ti bulk2g_pluto python3 osmo-nitb-scripts/main_uhd_spoof.py
 Tape ctrl+shift+T   </br>
 
 ### In terminal 3
+launch command of : 
+* VIII. Testing PlutoSDR SpoofScript1
+and / or
+* IX. Testing PlutoSDR SpoofScript2
+
 ## VIII. Testing PlutoSDR SpoofScript1
 ```
 docker exec -ti bulk2g_pluto bash osmo-nitb-scripts/scripts_spoof1/finding_imsi_extenstion.sh
