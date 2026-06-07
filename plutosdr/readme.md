@@ -27,9 +27,6 @@ Unplug and replug PlutoSDR </br>
 
 ## III. Installing tools
 ```
-rm -rf bulk2g_pluto ; mkdir bulk2g_pluto && cd bulk2g_pluto
-```
-```
 apt update
 ```
 ```
@@ -42,9 +39,10 @@ apt-get install linux-tools-common linux-tools-generic
 cpupower frequency-set -g performance
 ```
 
-
-
 ## IV. Building images
+```
+rm -rf bulk2g_pluto ; mkdir bulk2g_pluto && cd bulk2g_pluto
+```
 ```
 [ -f Dockerfile ] && rm -rf Dockerfile ; \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/Bulg2g_allsdr_docker/refs/heads/main/plutosdr/Dockerfile
@@ -268,11 +266,15 @@ docker exec -ti bulk2g_pluto python3 osmo-nitb-scripts/main_uhd.py
 Add victim phone and tape Tape ctrl+shift+T
 
 ### In terminal 3
-
+* Visualizing confguration
 ```
 docker exec -ti bulk2g_pluto  cat osmo-nitb-scripts/interact.py
 ```
+```
+docker exec -ti bulk2g_pluto  cat /config.json
+```
 Change the the paramater default for add_argument in `/var/lib/osmocom/hlr.sqlite3`
+* Launching fake sms sender
 ```
 docker exec -ti bulk2g_pluto  python3 osmo-nitb-scripts/interact.py -c /config.json
 ```
