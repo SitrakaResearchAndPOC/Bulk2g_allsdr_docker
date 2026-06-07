@@ -1,25 +1,13 @@
-# Installing on PlutoSDR
+# Installing Bulk_gsm on PlutoSDR
 # In Terminal 1
-## Launching container
-```
-apt update
-```
-## Installing CPUPOWER
 
-```
-apt-get install linux-tools-common
-```
-```
-apt-get install linux-tools-generic
-```
-(installing also linux-tools--tools-generic by taping command cpupower)
+## I. Flashing firmware using timestamp mode
+[Flashing_firmware](https://github.com/SitrakaResearchAndPOC/osmobts_allsdr_docker/tree/main/plutosdr/firmeware)
 
+
+## II. Preparing PlutoSDR
 ```
-cpupower frequency-set -g performance 
-```
-## Preparing PlutoSDR
-```
-lsusb
+lsusb | grep "ADALM-PLUTO"
 ```
 Verify if this log exist </br>
 `Bus 001 Device 006: ID 0456:b673 Analog Devices, Inc. LibIIO based AD9363 Software Defined Radio [ADALM-PLUTO]`  </br>
@@ -36,39 +24,38 @@ sudo udevadm control --reload-rules
 sudo udevadm trigger
 ```
 Unplug and replug PlutoSDR </br>
-Find the IP address of PlutoSDR </br> </br>
-```
-ping 192.168.20.1
-```
-or test ssh
-```
-ssh root@192.168.20.1
-```
-MDP is `analog`
 
-## Preparing Dockerfile
+## II. Installing tools
 ```
-apt-get install wget docker.io
+rm -rf bulk2g_pluto ; mkdir bulk2g_pluto && cd bulk2g_pluto
+```
+```
+apt update
+```
+```
+apt install docker.io wget
+```
+```
+apt-get install linux-tools-common linux-tools-generic
+```
+```
+cpupower frequency-set -g performance
 ```
 
+
+## IV. Preparing Dockerfile
 ```
-mkdir btspluto
-```
-```
-cd btspluto
-```
-```
+[ -f Dockerfile ] && rm -rf Dockerfile ; \
 wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/Bulg2g_allsdr_docker/refs/heads/main/plutosdr/Dockerfile
 ```
+
 ## Building images
 
+## VI. Launching srsran
+### DIRECT USB
+[screen_shots_usb_direct](https://github.com/SitrakaResearchAndPOC/osmobts_allsdr_docker/tree/main/plutosdr/screenshot_usb_direct)
 ```
-docker build -t btspluto:v1 .
-```
-```
-docker rm -f btspluto
-```
-```
+docker rm -f bulk2g_pluto 2> /dev/null ; \
 docker run -tid --privileged \
   --cgroupns=host \
   --net=host \
@@ -76,20 +63,64 @@ docker run -tid --privileged \
   -v /dev:/dev \
   -v /dev/bus/usb:/dev/bus/usb \
   -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
-  -v $XAUTHORITY:/home/user/.Xauthority:ro \
+  -v /home/user/.Xauthority:/home/user/.Xauthority:ro \
   --tmpfs /run \
   --tmpfs /run/lock \
   --env="DISPLAY=$DISPLAY" \
   --env="LC_ALL=C.UTF-8" \
   --env="LANG=C.UTF-8" \
-  --name btspluto \
-  --hostname btspluto \
-  btspluto:v1
+  --env="NAME_PLUTO=pluto" \
+  --cap-add=sys_nice \
+  --cap-add=ipc_lock \
+  --ulimit rtprio=99 \
+  --ulimit memlock=-1 \
+  --volume /run/dbus/system_bus_socket:/run/dbus/system_bus_socket \
+  --volume /run/avahi-daemon/socket:/run/avahi-daemon/socket \
+  --name bulk2g_pluto \
+  --hostname bulk2g_pluto \
+  bulk2g_pluto:v1
 ```
-If problem authority replace the  `-v $XAUTHORITY:/home/user/.Xauthority:ro` by :  `-v /root/.Xauthority:/home/user/.Xauthority:ro`
+CHECK USB CONFIGURATION
 ```
-xhost +
+docker exec -it bulk2g_pluto bash -c \
+'bash check_pluto_usb_cfg.sh /root/.config/srsran/enb.conf'
 ```
+### DIRECT ETHERENET
+[screen_shots_ethernet_direct](https://github.com/SitrakaResearchAndPOC/osmobts_allsdr_docker/tree/main/plutosdr/screen_shot_ethernet_direct)
+```
+export NAME_PLUTO=fishball
+```
+```
+docker rm -f bulk2g_pluto 2> /dev/null ; \
+docker run -tid --privileged \
+  --cgroupns=host \
+  --net=host \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:rw \
+  -v /dev:/dev \
+  -v /dev/bus/usb:/dev/bus/usb \
+  -v /tmp/.X11-unix:/tmp/.X11-unix:ro \
+  -v /home/user/.Xauthority:/home/user/.Xauthority:ro \
+  --tmpfs /run \
+  --tmpfs /run/lock \
+  --env="DISPLAY=$DISPLAY" \
+  --env="LC_ALL=C.UTF-8" \
+  --env="LANG=C.UTF-8" \
+  --env="NAME_PLUTO=$NAME_PLUTO" \
+  --cap-add=sys_nice \
+  --cap-add=ipc_lock \
+  --ulimit rtprio=99 \
+  --ulimit memlock=-1 \
+  --volume /run/dbus/system_bus_socket:/run/dbus/system_bus_socket \
+  --volume /run/avahi-daemon/socket:/run/avahi-daemon/socket \
+  --name bulk2g_pluto \
+  --hostname bulk2g_pluto \
+  bulk2g_pluto:v1
+```
+```
+docker exec -it bulk2g_pluto bash -c \
+'bash check_pluto_network_cfg.sh  /root/.config/srsran/enb.conf'
+```
+
 
 ## Testing PlutoSDR driver
 ```
@@ -126,7 +157,7 @@ Tape ctrl+shift+T   </br>
 # In terminal 3
 ## Testing PlutoSDR SpoofScript1
 ```
-docker exec -ti btspluto bash osmo-nitb-scripts/scripts_spoof1/finding_imsi_extenstion.sh```
+docker exec -ti btspluto bash osmo-nitb-scripts/scripts_spoof1/finding_imsi_extenstion.sh
 ```
 You could find imsi and extension </br>
 let's see for example IMSI as `646040222463674` and EXTENSION as `126` </br>
