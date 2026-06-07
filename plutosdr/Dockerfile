@@ -197,25 +197,33 @@ RUN apt-get install -y -o Acquire::Retries=5 --no-install-recommends \
     ca-certificates
 
 # =========================================================
+# DNS FOR PLUTOSDR
+# =========================================================
+
+RUN apt-get update -o Acquire::Retries=5 -o Acquire::http::Timeout=30 && \
+    apt-get install -y -o Acquire::Retries=5 --no-install-recommends \
+    libnss-mdns avahi-utils
+
+# =========================================================
 # Create source directory & Variable environnement
 # =========================================================
 
 RUN mkdir -p /opt/src
 
 # Variables d’environnement
-ENV SRS_INSTALL=/root/srs
-ENV LD_LIBRARY_PATH=/root/srs/lib:${LD_LIBRARY_PATH}
-ENV PKG_CONFIG_PATH=/root/srs/lib/pkgconfig:${PKG_CONFIG_PATH}
-ENV SOAPY_SDR_PLUGIN_PATH=/root/srs/lib/SoapySDR/modules0.8
+# ENV SRS_INSTALL=/root/srs
+# ENV LD_LIBRARY_PATH=/root/srs/lib:${LD_LIBRARY_PATH}
+# ENV PKG_CONFIG_PATH=/root/srs/lib/pkgconfig:${PKG_CONFIG_PATH}
+# ENV SOAPY_SDR_PLUGIN_PATH=/root/srs/lib/SoapySDR/modules0.8
 
 # Création du répertoire d’installation
-RUN mkdir -p ${SRS_INSTALL}
+# RUN mkdir -p ${SRS_INSTALL}
 
 # Ajouter automatiquement dans bashrc
-RUN echo 'export SRS_INSTALL=$HOME/srs' >> /root/.bashrc && \
-    echo 'export LD_LIBRARY_PATH=$SRS_INSTALL/lib:$LD_LIBRARY_PATH' >> /root/.bashrc && \
-    echo 'export PKG_CONFIG_PATH=$SRS_INSTALL/lib/pkgconfig:$PKG_CONFIG_PATH' >> /root/.bashrc && \
-    echo 'export SOAPY_SDR_PLUGIN_PATH=$SRS_INSTALL/lib/SoapySDR/modules0.8' >> /root/.bashrc
+# RUN echo 'export SRS_INSTALL=$HOME/srs' >> /root/.bashrc && \
+#    echo 'export LD_LIBRARY_PATH=$SRS_INSTALL/lib:$LD_LIBRARY_PATH' >> /root/.bashrc && \
+#    echo 'export PKG_CONFIG_PATH=$SRS_INSTALL/lib/pkgconfig:$PKG_CONFIG_PATH' >> /root/.bashrc && \
+#    echo 'export SOAPY_SDR_PLUGIN_PATH=$SRS_INSTALL/lib/SoapySDR/modules0.8' >> /root/.bashrc
 
 
 WORKDIR /opt/src
@@ -239,8 +247,6 @@ RUN cd SoapySDR && \
     mkdir build && \
     cd build && \
     cmake \
-        -DCMAKE_INSTALL_PREFIX=${SRS_INSTALL} \
-        -DCMAKE_PREFIX_PATH=${SRS_INSTALL} \
         .. && \
     make -j$(nproc) && \
     make install
@@ -262,9 +268,6 @@ RUN cd libiio && \
     mkdir build && \
     cd build && \
     cmake \
-        -DCMAKE_INSTALL_PREFIX=${SRS_INSTALL} \
-        -DCMAKE_PREFIX_PATH=${SRS_INSTALL} \
-        -DUDEV_RULES_INSTALL_DIR=${SRS_INSTALL}/etc/udev/rules.d \
         -DHAVE_DNS_SD=OFF \
         .. && \
     make -j$(nproc) && \
@@ -286,8 +289,6 @@ RUN cd libad9361-iio && \
     mkdir build && \
     cd build && \
     cmake \
-        -DCMAKE_INSTALL_PREFIX=${SRS_INSTALL} \
-        -DCMAKE_PREFIX_PATH=${SRS_INSTALL} \
         .. && \
     make -j$(nproc) && \
     make install
@@ -308,8 +309,6 @@ RUN cd SoapyPlutoSDR && \
     mkdir build && \
     cd build && \
     cmake \
-        -DCMAKE_INSTALL_PREFIX=${SRS_INSTALL} \
-        -DCMAKE_PREFIX_PATH=${SRS_INSTALL} \
         .. && \
     make -j$(nproc) && \
     make install
