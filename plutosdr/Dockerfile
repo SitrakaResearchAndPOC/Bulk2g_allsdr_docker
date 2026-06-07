@@ -647,6 +647,11 @@ RUN wget -T 30 --tries=5 \
     chmod +x install_services.sh && \
     cp config.json /
 
+WORKDIR /root
+RUN wget  https://raw.githubusercontent.com/SitrakaResearchAndPOC/osmobts_allsdr_docker/refs/heads/main/plutosdr/check_pluto_network_cfg.sh && \
+    wget  https://raw.githubusercontent.com/SitrakaResearchAndPOC/osmobts_allsdr_docker/refs/heads/main/plutosdr/check_pluto_usb_cfg.sh && \
+    chmod +x *.sh
+
 # =========================================================
 # Ports
 # =========================================================
