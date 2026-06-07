@@ -85,7 +85,7 @@ docker run -tid --privileged \
 CHECK USB CONFIGURATION
 ```
 docker exec -it bulk2g_pluto bash -c \
-'bash /osmobts/check_pluto_usb_cfg.sh /osmobts/fork_osmo-trx_soapy/Transceiver52M/test1.cfg'
+'bash /root/check_pluto_usb_cfg.sh /opt/src/fork_osmo-trx_soapy/Transceiver52M/test1.cfg'
 ```
 
 ### DIRECT ETHERENET
@@ -122,7 +122,7 @@ docker run -tid --privileged \
 CHECK ETHERNET CONFIGURATION
 ```
 docker exec -it bulk2g_pluto bash -c \
-'bash /osmobts/check_pluto_network_cfg.sh /osmobts/fork_osmo-trx_soapy/Transceiver52M/test1.cfg'
+'bash /root/check_pluto_network_cfg.sh /opt/src/fork_osmo-trx_soapy/Transceiver52M/test1.cfg'
 ```
 
 
