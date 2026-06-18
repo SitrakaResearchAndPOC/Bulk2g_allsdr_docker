@@ -50,7 +50,7 @@ mkdir btsusrp
 cd btsusrp
 ```
 ```
-wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/Bulg2g_allsdr_docker/refs/heads/main/usrp/Dockerfile
+wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/Bulk2g_allsdr_docker/refs/heads/main/usrp/Dockerfile
 ```
 ## Building images
 
