@@ -45,7 +45,7 @@ rm -rf bulk2g_pluto ; mkdir bulk2g_pluto && cd bulk2g_pluto
 ```
 ```
 [ -f Dockerfile ] && rm -rf Dockerfile ; \
-wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/Bulg2g_allsdr_docker/refs/heads/main/plutosdr/Dockerfile
+wget https://raw.githubusercontent.com/SitrakaResearchAndPOC/Bulk2g_allsdr_docker/refs/heads/main/plutosdr/Dockerfile
 ```
 ```
 docker  build -t bulk2g_pluto:v1 .
