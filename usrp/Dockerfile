@@ -175,15 +175,21 @@ RUN mkdir -p /opt/src
 
 WORKDIR /opt/src
 
-# =========================================================
-# SOAPY INSTEAD UHD
-# =========================================================
-
-
 
 # =========================================================
-# No Download USRP Images
+# Download USRP Images
 # =========================================================
+RUN mkdir src && \
+cd src && \
+git clone --depth 1 -b v3.15.0.0 https://github.com/EttusResearch/uhd && \
+cd uhd/host && \
+mkdir build && \
+cd build && \
+cmake .. && \
+make -j $(nproc --ignore 1) && \
+make install && \
+ldconfig && \
+uhd_images_downloader
 
 
 # =========================================================
