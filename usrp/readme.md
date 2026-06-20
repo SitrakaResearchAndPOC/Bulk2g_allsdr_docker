@@ -78,7 +78,7 @@ docker run -tid --privileged \
   --hostname bulk2g_usrp \
   bulk2g_usrp:v1
 ```
-If problem authority replace the  `-v $XAUTHORITY:/home/user/.Xauthority:ro` by :  `-v /root/.Xauthority:/home/user/.Xauthority:ro`
+If problem authority replace the  `-v /home/user/.Xauthority:/home/user/.Xauthority:ro` by :  `-v /root/.Xauthority:/home/user/.Xauthority:ro`
 ```
 xhost +
 ```
@@ -93,7 +93,7 @@ docker exec -ti bulk2g_usrp bash -c 'uhd_find_devices'
 
 ## Launching transceiver
 ```
-docker exec -ti btusrp bash -c 'osmo-trx-uhd -C /etc/osmocom/osmo-trx-uhd.cfg'
+docker exec -ti bulk2g_usrp bash -c 'osmo-trx-uhd -C /etc/osmocom/osmo-trx-uhd.cfg'
 ```
 Tape ctrl+shift+T   </br>
 
@@ -103,14 +103,14 @@ launch service   :
 docker exec -ti bulk2g_usrp bash -c 'cd osmo-nitb-scripts && bash install_services.sh'
 ```
 ```
-docker exec -ti usrp python3 osmo-nitb-scripts/main_uhd_spoof.py
+docker exec -ti bulk2g_usrp python3 osmo-nitb-scripts/main_uhd_spoof.py
 ```
 Tape ctrl+shift+T   </br>
 
 # In terminal 3
 ## Testing USRP SpoofScript1
 ```
-docker exec -ti bulk2g_usrp bash osmo-nitb-scripts/scripts_spoof1/finding_imsi_extenstion.sh```
+docker exec -ti bulk2g_usrp bash osmo-nitb-scripts/scripts_spoof1/finding_imsi_extenstion.sh
 ```
 You could find imsi and extension </br>
 let's see for example IMSI as `646040222463674` and EXTENSION as `126` </br>
@@ -173,7 +173,7 @@ docker exec -ti bulk2g_usrp bash -c 'uhd_find_devices'
 
 ## Launching transceiver
 ```
-docker exec -ti btusrp bash -c 'osmo-trx-uhd -C /etc/osmocom/osmo-trx-uhd.cfg'
+docker exec -ti bulk2g_usrp bash -c 'osmo-trx-uhd -C /etc/osmocom/osmo-trx-uhd.cfg'
 ```
 
 # In terminal 2
